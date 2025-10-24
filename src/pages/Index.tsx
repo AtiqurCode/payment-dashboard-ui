@@ -4,13 +4,12 @@ import { TransactionTable } from "@/components/TransactionTable";
 import { PayoutMethodCard, PayoutMethod } from "@/components/PayoutMethodCard";
 import { RequestPayoutModal } from "@/components/RequestPayoutModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AddPaymentMethodDialog } from "@/components/AddPaymentMethodDialog";
 import {
   Wallet,
   Clock,
   Calendar,
-  Plus,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -53,6 +52,10 @@ const Index = () => {
   const handleRemove = (id: string) => {
     setPayoutMethods((methods) => methods.filter((method) => method.id !== id));
     toast.success("Payout method removed");
+  };
+
+  const handleAddMethod = (method: PayoutMethod) => {
+    setPayoutMethods((methods) => [...methods, method]);
   };
 
   return (
@@ -126,10 +129,7 @@ const Index = () => {
                     Manage how you receive your payments
                   </p>
                 </div>
-                <Button variant="outline" onClick={() => toast.info("Add method feature coming soon!")}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Method
-                </Button>
+                <AddPaymentMethodDialog onAdd={handleAddMethod} />
               </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {payoutMethods.map((method) => (
