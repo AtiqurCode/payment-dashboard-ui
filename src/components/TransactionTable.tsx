@@ -17,6 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Search, Filter } from "lucide-react";
 
 export interface Transaction {
@@ -125,11 +133,157 @@ const mockTransactions: Transaction[] = [
     status: "pending",
     method: "Bank Transfer",
   },
+  {
+    id: "TXN013",
+    date: "2024-11-10",
+    description: "Bonus payment",
+    amount: 1500.00,
+    status: "completed",
+    method: "PayPal",
+  },
+  {
+    id: "TXN014",
+    date: "2024-11-05",
+    description: "Consulting fees",
+    amount: 2100.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN015",
+    date: "2024-11-01",
+    description: "Monthly payout - November",
+    amount: 2800.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN016",
+    date: "2024-10-28",
+    description: "Freelance project",
+    amount: 3400.00,
+    status: "completed",
+    method: "Card",
+  },
+  {
+    id: "TXN017",
+    date: "2024-10-22",
+    description: "Partnership revenue",
+    amount: 1850.00,
+    status: "completed",
+    method: "PayPal",
+  },
+  {
+    id: "TXN018",
+    date: "2024-10-18",
+    description: "Service contract",
+    amount: 2250.00,
+    status: "pending",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN019",
+    date: "2024-10-15",
+    description: "Referral bonus",
+    amount: 450.00,
+    status: "completed",
+    method: "PayPal",
+  },
+  {
+    id: "TXN020",
+    date: "2024-10-10",
+    description: "Marketing commission",
+    amount: 1100.00,
+    status: "completed",
+    method: "Card",
+  },
+  {
+    id: "TXN021",
+    date: "2024-10-05",
+    description: "Performance bonus",
+    amount: 1800.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN022",
+    date: "2024-10-01",
+    description: "Monthly payout - October",
+    amount: 2650.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN023",
+    date: "2024-09-28",
+    description: "Consulting services",
+    amount: 2900.00,
+    status: "completed",
+    method: "PayPal",
+  },
+  {
+    id: "TXN024",
+    date: "2024-09-22",
+    description: "Project milestone",
+    amount: 3100.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN025",
+    date: "2024-09-18",
+    description: "Affiliate earnings",
+    amount: 720.00,
+    status: "failed",
+    method: "Card",
+  },
+  {
+    id: "TXN026",
+    date: "2024-09-15",
+    description: "Sales commission Q3",
+    amount: 4500.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN027",
+    date: "2024-09-10",
+    description: "Service fees",
+    amount: 890.00,
+    status: "completed",
+    method: "PayPal",
+  },
+  {
+    id: "TXN028",
+    date: "2024-09-05",
+    description: "Contract payment",
+    amount: 2400.00,
+    status: "pending",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN029",
+    date: "2024-09-01",
+    description: "Monthly payout - September",
+    amount: 2750.00,
+    status: "completed",
+    method: "Bank Transfer",
+  },
+  {
+    id: "TXN030",
+    date: "2024-08-28",
+    description: "Sponsorship revenue",
+    amount: 5500.00,
+    status: "completed",
+    method: "Card",
+  },
 ];
 
 export const TransactionTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const filteredTransactions = mockTransactions.filter((transaction) => {
     const matchesSearch =
@@ -139,6 +293,10 @@ export const TransactionTable = () => {
       statusFilter === "all" || transaction.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadge = (status: Transaction["status"]) => {
     const variants = {
@@ -199,7 +357,7 @@ export const TransactionTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTransactions.map((transaction) => (
+            {paginatedTransactions.map((transaction) => (
               <TableRow key={transaction.id} className="hover:bg-muted/30 transition-colors">
                 <TableCell className="font-mono text-sm">{transaction.id}</TableCell>
                 <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
@@ -219,6 +377,36 @@ export const TransactionTable = () => {
         <div className="text-center py-12 text-muted-foreground">
           No transactions found matching your filters.
         </div>
+      )}
+
+      {filteredTransactions.length > 0 && totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(page)}
+                  isActive={currentPage === page}
+                  className="cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
     </div>
   );
