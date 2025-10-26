@@ -9,6 +9,7 @@ import {
   Wallet,
   Clock,
   Calendar,
+  Banknote,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -86,7 +87,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">P</span>
+              <Banknote className="text-white w-5 h-5" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Payment Dashboard</h1>
