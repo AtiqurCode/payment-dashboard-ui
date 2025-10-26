@@ -43,13 +43,13 @@ export const PayoutSummaryCard = ({
     <Card className={`${gradientClass} p-6 shadow-md hover:shadow-lg transition-all duration-300 border-0`}>
       <div className="flex items-start justify-between">
         <div className="space-y-2 flex-1">
-          <p className={`text-sm font-medium ${variant === "default" ? "text-muted-foreground" : "opacity-90"}`}>
+          <p className={`text-sm font-medium ${variant === "default" ? "text-muted-foreground" : "text-white/90"}`}>
             {title}
           </p>
           <div>
             <h3 className={`text-3xl font-bold ${textColorClass}`}>{value}</h3>
             {subtitle && (
-              <p className={`text-sm mt-1 ${variant === "default" ? "text-muted-foreground" : "opacity-80"}`}>
+              <p className={`text-sm mt-1 ${variant === "default" ? "text-muted-foreground" : "text-white/80"}`}>
                 {subtitle}
               </p>
             )}
@@ -59,7 +59,7 @@ export const PayoutSummaryCard = ({
               <span className={trend.isPositive ? "text-success" : "text-destructive"}>
                 {trend.isPositive ? "↑" : "↓"} {trend.value}
               </span>
-              <span className={`${variant === "default" ? "text-muted-foreground" : "opacity-70"}`}>
+              <span className={`${variant === "default" ? "text-muted-foreground" : "text-white/70"}`}>
                 vs last month
               </span>
             </div>
