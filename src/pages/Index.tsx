@@ -37,6 +37,27 @@ const Index = () => {
       details: "••••8901",
       isDefault: false,
     },
+    {
+      id: "4",
+      type: "bank",
+      name: "Bank of America",
+      details: "••••7623",
+      isDefault: false,
+    },
+    {
+      id: "5",
+      type: "card",
+      name: "Mastercard",
+      details: "••••3456",
+      isDefault: false,
+    },
+    {
+      id: "6",
+      type: "paypal",
+      name: "PayPal Business",
+      details: "business@company.com",
+      isDefault: false,
+    },
   ]);
 
   const handleSetDefault = (id: string) => {
@@ -63,9 +84,14 @@ const Index = () => {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Payment Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Manage your payouts and transactions</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-lg">P</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Payment Dashboard</h1>
+              <p className="text-sm text-muted-foreground">Manage your payouts and transactions</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
