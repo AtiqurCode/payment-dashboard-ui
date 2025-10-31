@@ -146,9 +146,9 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Payment Method</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Add Payment Method</DialogTitle>
           <DialogDescription>
             Add a new payout method to receive your payments
           </DialogDescription>
@@ -159,27 +159,27 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
             type="button"
             variant={selectedType === "card" ? "default" : "outline"}
             onClick={() => handleTypeChange("card")}
-            className="flex flex-col h-auto py-4"
+            className="flex flex-col h-auto py-3 sm:py-4"
           >
-            <CreditCard className="h-5 w-5 mb-1" />
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mb-1" />
             <span className="text-xs">Card</span>
           </Button>
           <Button
             type="button"
             variant={selectedType === "bank" ? "default" : "outline"}
             onClick={() => handleTypeChange("bank")}
-            className="flex flex-col h-auto py-4"
+            className="flex flex-col h-auto py-3 sm:py-4"
           >
-            <Building2 className="h-5 w-5 mb-1" />
+            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 mb-1" />
             <span className="text-xs">Bank</span>
           </Button>
           <Button
             type="button"
             variant={selectedType === "paypal" ? "default" : "outline"}
             onClick={() => handleTypeChange("paypal")}
-            className="flex flex-col h-auto py-4"
+            className="flex flex-col h-auto py-3 sm:py-4"
           >
-            <Wallet className="h-5 w-5 mb-1" />
+            <Wallet className="h-4 w-4 sm:h-5 sm:w-5 mb-1" />
             <span className="text-xs">PayPal</span>
           </Button>
         </div>
@@ -224,15 +224,15 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
                   )}
                 />
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   <FormField
                     control={form.control}
                     name="expiryMonth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Month</FormLabel>
+                        <FormLabel className="text-xs sm:text-sm">Month</FormLabel>
                         <FormControl>
-                          <Input placeholder="MM" maxLength={2} {...field} />
+                          <Input placeholder="MM" maxLength={2} {...field} className="text-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -244,9 +244,9 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
                     name="expiryYear"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Year</FormLabel>
+                        <FormLabel className="text-xs sm:text-sm">Year</FormLabel>
                         <FormControl>
-                          <Input placeholder="YY" maxLength={2} {...field} />
+                          <Input placeholder="YY" maxLength={2} {...field} className="text-sm" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -258,13 +258,14 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
                     name="cvv"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>CVV</FormLabel>
+                        <FormLabel className="text-xs sm:text-sm">CVV</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="123"
                             maxLength={4}
                             {...field}
+                            className="text-sm"
                           />
                         </FormControl>
                         <FormMessage />
@@ -419,11 +420,11 @@ export const AddPaymentMethodDialog = ({ onAdd, trigger }: AddPaymentMethodDialo
               </>
             )}
 
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <DialogFooter className="pt-4 flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button type="submit" className="bg-gradient-primary">
+              <Button type="submit" className="bg-gradient-primary w-full sm:w-auto">
                 Add Payment Method
               </Button>
             </DialogFooter>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Table,
   TableBody,
@@ -25,7 +26,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Search, Filter } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Search, Filter, Calendar, DollarSign, CreditCard, FileText } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export interface Transaction {
   id: string;
@@ -283,6 +292,8 @@ export const TransactionTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const isMobile = useIsMobile();
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -349,32 +360,45 @@ export const TransactionTable = () => {
       </div>
 
       <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedTransactions.map((transaction) => (
-              <TableRow key={transaction.id} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-mono text-sm">{transaction.id}</TableCell>
-                <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                <TableCell className="font-medium">{transaction.description}</TableCell>
-                <TableCell>{transaction.method}</TableCell>
-                <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                <TableCell className="text-right font-semibold">
-                  ${transaction.amount.toFixed(2)}
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="min-w-[100px]">Transaction ID</TableHead>
+                <TableHead className="hidden sm:table-cell">Date</TableHead>
+                <TableHead className="min-w-[150px]">Description</TableHead>
+                <TableHead className="hidden md:table-cell">Method</TableHead>
+                <TableHead className="min-w-[90px]">Status</TableHead>
+                <TableHead className="text-right min-w-[100px]">Amount</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedTransactions.map((transaction) => (
+                <TableRow 
+                  key={transaction.id} 
+                  className="hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => setSelectedTransaction(transaction)}
+                >
+                  <TableCell className="font-mono text-sm">{transaction.id}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex flex-col gap-1">
+                      <span>{transaction.description}</span>
+                      <span className="text-xs text-muted-foreground sm:hidden">
+                        {new Date(transaction.date).toLocaleDateString()} • {transaction.method}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{transaction.method}</TableCell>
+                  <TableCell>{getStatusBadge(transaction.status)}</TableCell>
+                  <TableCell className="text-right font-semibold">
+                    ${transaction.amount.toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {filteredTransactions.length === 0 && (
@@ -385,24 +409,41 @@ export const TransactionTable = () => {
 
       {filteredTransactions.length > 0 && totalPages > 1 && (
         <Pagination>
-          <PaginationContent>
+          <PaginationContent className="flex-wrap gap-1">
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
               />
             </PaginationItem>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(page)}
-                  isActive={currentPage === page}
-                  className="cursor-pointer"
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            {(() => {
+              const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+              const visiblePages = isMobile
+                ? pages.filter((page) => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+                : pages;
+
+              return visiblePages.map((page, index, array) => {
+                const showEllipsis = isMobile && index > 0 && array[index - 1] !== page - 1;
+                return (
+                  <React.Fragment key={page}>
+                    {showEllipsis && (
+                      <PaginationItem>
+                        <span className="px-2 text-muted-foreground">...</span>
+                      </PaginationItem>
+                    )}
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer min-w-[40px]"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  </React.Fragment>
+                );
+              });
+            })()}
             <PaginationItem>
               <PaginationNext
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
@@ -412,6 +453,93 @@ export const TransactionTable = () => {
           </PaginationContent>
         </Pagination>
       )}
+
+      <Dialog open={!!selectedTransaction} onOpenChange={(open) => !open && setSelectedTransaction(null)}>
+        <DialogContent className="max-w-2xl mx-4">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <FileText className="h-5 w-5" />
+              Transaction Details
+            </DialogTitle>
+            <DialogDescription>
+              Complete information for transaction {selectedTransaction?.id}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedTransaction && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <FileText className="h-4 w-4" />
+                    Transaction ID
+                  </div>
+                  <div className="font-mono text-base font-semibold break-all">
+                    {selectedTransaction.id}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <DollarSign className="h-4 w-4" />
+                    Amount
+                  </div>
+                  <div className="text-xl sm:text-2xl font-bold text-foreground">
+                    ${selectedTransaction.amount.toFixed(2)}
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <FileText className="h-4 w-4" />
+                    Description
+                  </div>
+                  <div className="text-base font-medium">
+                    {selectedTransaction.description}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      Date
+                    </div>
+                    <div className="text-base">
+                      {new Date(selectedTransaction.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CreditCard className="h-4 w-4" />
+                      Payment Method
+                    </div>
+                    <div className="text-base font-medium">
+                      {selectedTransaction.method}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground">Status</div>
+                  <div>
+                    {getStatusBadge(selectedTransaction.status)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

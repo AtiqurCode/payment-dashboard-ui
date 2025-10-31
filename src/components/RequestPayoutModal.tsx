@@ -46,14 +46,15 @@ export const RequestPayoutModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-colored">
-          <DollarSign className="h-4 w-4 mr-2" />
-          Request Payout
+        <Button className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-colored text-sm sm:text-base">
+          <DollarSign className="h-4 w-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Request Payout</span>
+          <span className="sm:hidden">Request</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Request a Payout</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Request a Payout</DialogTitle>
           <DialogDescription>
             Enter the amount you'd like to withdraw and select your preferred payout method.
           </DialogDescription>
@@ -77,7 +78,7 @@ export const RequestPayoutModal = () => {
                   min="0"
                 />
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Available balance: <span className="font-semibold text-foreground">$8,450.00</span>
               </p>
             </div>
@@ -95,11 +96,11 @@ export const RequestPayoutModal = () => {
               </Select>
             </div>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button type="submit" className="bg-gradient-primary">
+            <Button type="submit" className="bg-gradient-primary w-full sm:w-auto">
               Submit Request
             </Button>
           </DialogFooter>
