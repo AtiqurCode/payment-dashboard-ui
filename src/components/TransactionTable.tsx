@@ -33,7 +33,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Search, Filter, Calendar, DollarSign, CreditCard, FileText } from "lucide-react";
+import { Search, Filter, Calendar, DollarSign, CreditCard, FileText, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 export interface Transaction {
@@ -45,7 +45,7 @@ export interface Transaction {
   method: string;
 }
 
-const mockTransactions: Transaction[] = [
+export const mockTransactions: Transaction[] = [
   {
     id: "TXN001",
     date: "2025-01-20",
@@ -288,11 +288,16 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
+type SortField = "date" | "amount" | "status" | null;
+type SortDirection = "asc" | "desc";
+
 export const TransactionTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const isMobile = useIsMobile();
   const itemsPerPage = 10;
 
@@ -300,14 +305,49 @@ export const TransactionTable = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  const filteredTransactions = mockTransactions.filter((transaction) => {
-    const matchesSearch =
-      transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || transaction.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredTransactions = mockTransactions
+    .filter((transaction) => {
+      const matchesSearch =
+        transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.id.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || transaction.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      
+      let comparison = 0;
+      switch (sortField) {
+        case "date":
+          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+          break;
+        case "amount":
+          comparison = a.amount - b.amount;
+          break;
+        case "status":
+          comparison = a.status.localeCompare(b.status);
+          break;
+      }
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setSortField(null);
+  };
+
+  const hasActiveFilters = searchTerm || statusFilter !== "all" || sortField !== null;
 
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -357,21 +397,108 @@ export const TransactionTable = () => {
             <SelectItem value="failed">Failed</SelectItem>
           </SelectContent>
         </Select>
+        {hasActiveFilters && (
+          <Button variant="outline" onClick={clearFilters} className="w-full sm:w-auto">
+            <X className="h-4 w-4 mr-2" />
+            Clear
+          </Button>
+        )}
+      </div>
+
+      {/* Active Filters */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-sm text-muted-foreground">Filters:</span>
+          {searchTerm && (
+            <Badge variant="secondary" className="gap-1">
+              Search: {searchTerm}
+              <button
+                onClick={() => setSearchTerm("")}
+                className="ml-1 hover:bg-muted rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {statusFilter !== "all" && (
+            <Badge variant="secondary" className="gap-1">
+              Status: {statusFilter}
+              <button
+                onClick={() => setStatusFilter("all")}
+                className="ml-1 hover:bg-muted rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+          {sortField && (
+            <Badge variant="secondary" className="gap-1">
+              Sort: {sortField} ({sortDirection})
+              <button
+                onClick={() => setSortField(null)}
+                className="ml-1 hover:bg-muted rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+        </div>
+      )}
+
+      {/* Transaction Count */}
+      <div className="text-sm text-muted-foreground">
+        Showing {paginatedTransactions.length} of {filteredTransactions.length} transactions
       </div>
 
       <div className="border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="min-w-[100px]">Transaction ID</TableHead>
-                <TableHead className="hidden sm:table-cell">Date</TableHead>
-                <TableHead className="min-w-[150px]">Description</TableHead>
-                <TableHead className="hidden md:table-cell">Method</TableHead>
-                <TableHead className="min-w-[90px]">Status</TableHead>
-                <TableHead className="text-right min-w-[100px]">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="min-w-[100px]">Transaction ID</TableHead>
+              <TableHead 
+                className="hidden sm:table-cell cursor-pointer hover:bg-muted/70 select-none"
+                onClick={() => handleSort("date")}
+              >
+                <div className="flex items-center gap-1">
+                  Date
+                  {sortField === "date" ? (
+                    sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead className="min-w-[150px]">Description</TableHead>
+              <TableHead className="hidden md:table-cell">Method</TableHead>
+              <TableHead 
+                className="min-w-[90px] cursor-pointer hover:bg-muted/70 select-none"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center gap-1">
+                  Status
+                  {sortField === "status" ? (
+                    sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+              </TableHead>
+              <TableHead 
+                className="text-right min-w-[100px] cursor-pointer hover:bg-muted/70 select-none"
+                onClick={() => handleSort("amount")}
+              >
+                <div className="flex items-center justify-end gap-1">
+                  Amount
+                  {sortField === "amount" ? (
+                    sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                  ) : (
+                    <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
             <TableBody>
               {paginatedTransactions.map((transaction) => (
                 <TableRow 

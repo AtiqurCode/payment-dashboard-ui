@@ -1,19 +1,27 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { PayoutSummaryCard } from "@/components/PayoutSummaryCard";
-import { TransactionTable } from "@/components/TransactionTable";
+import { TransactionTable, Transaction } from "@/components/TransactionTable";
 import { PayoutMethodCard, PayoutMethod } from "@/components/PayoutMethodCard";
 import { RequestPayoutModal } from "@/components/RequestPayoutModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AddPaymentMethodDialog } from "@/components/AddPaymentMethodDialog";
+import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
+import { InvoiceList, Invoice, mockInvoices } from "@/components/InvoiceList";
 import {
   Wallet,
   Clock,
   Calendar,
   CircleDollarSign,
+  Settings,
+  BarChart3,
+  FileText,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { mockTransactions } from "@/components/TransactionTable";
 
 const Index = () => {
   const [payoutMethods, setPayoutMethods] = useState<PayoutMethod[]>([
@@ -80,6 +88,17 @@ const Index = () => {
     setPayoutMethods((methods) => [...methods, method]);
   };
 
+  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
+
+  const handleInvoiceCreated = (invoice: Invoice) => {
+    setInvoices([invoice, ...invoices]);
+    toast.success("Invoice created successfully!");
+  };
+
+  const handleInvoiceUpdate = (updatedInvoice: Invoice) => {
+    setInvoices(invoices.map((inv) => (inv.id === updatedInvoice.id ? updatedInvoice : inv)));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -96,6 +115,12 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-end flex-shrink-0">
+              <Link to="/settings">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="sr-only">Settings</span>
+                </Button>
+              </Link>
               <ThemeToggle />
               <RequestPayoutModal />
             </div>
@@ -132,13 +157,23 @@ const Index = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="transactions" className="space-y-4 sm:space-y-6">
-          <TabsList className="grid w-full max-w-full sm:max-w-md grid-cols-2 h-auto gap-0.5 sm:gap-1">
+          <TabsList className="grid w-full max-w-full sm:max-w-2xl grid-cols-2 sm:grid-cols-4 h-auto gap-0.5 sm:gap-1">
             <TabsTrigger value="transactions" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5 whitespace-normal sm:whitespace-nowrap break-words min-w-0">
               <span className="truncate">Transactions</span>
             </TabsTrigger>
             <TabsTrigger value="methods" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5 whitespace-normal sm:whitespace-nowrap break-words min-w-0">
-              <span className="hidden sm:inline truncate">Payout Methods</span>
+              <span className="hidden sm:inline truncate">Methods</span>
               <span className="sm:hidden truncate">Methods</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5 whitespace-normal sm:whitespace-nowrap break-words min-w-0">
+              <BarChart3 className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline truncate">Analytics</span>
+              <span className="sm:hidden truncate">Stats</span>
+            </TabsTrigger>
+            <TabsTrigger value="invoices" className="text-xs sm:text-sm px-2 sm:px-3 py-2 sm:py-1.5 whitespace-normal sm:whitespace-nowrap break-words min-w-0">
+              <FileText className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline truncate">Invoices</span>
+              <span className="sm:hidden truncate">Bills</span>
             </TabsTrigger>
           </TabsList>
 
@@ -151,6 +186,22 @@ const Index = () => {
                 </p>
               </div>
               <TransactionTable />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <Card className="p-4 sm:p-6">
+              <AnalyticsDashboard transactions={mockTransactions} />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="invoices" className="space-y-4">
+            <Card className="p-4 sm:p-6">
+              <InvoiceList
+                invoices={invoices}
+                onInvoiceCreated={handleInvoiceCreated}
+                onInvoiceUpdate={handleInvoiceUpdate}
+              />
             </Card>
           </TabsContent>
 
