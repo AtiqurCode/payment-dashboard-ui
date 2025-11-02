@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Card } from "@/components/ui/card";
 import {
   Select,
@@ -42,6 +43,8 @@ const PAYMENT_METHOD_COLORS = ["#8b5cf6", "#06b6d4", "#f59e0b", "#10b981"];
 
 export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) => {
   const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+  const isMobile = useIsMobile();
+  const chartHeight = isMobile ? 250 : 300;
 
   const chartData = useMemo(() => {
     const now = new Date();
@@ -130,8 +133,8 @@ export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) =>
       {/* Time Range Selector */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold mb-1">Analytics Dashboard</h2>
-          <p className="text-sm text-muted-foreground">Track your financial performance and trends</p>
+          <h2 className="text-xl sm:text-2xl font-bold mb-1">Analytics Dashboard</h2>
+          <p className="hidden sm:block text-sm text-muted-foreground">Track your financial performance and trends</p>
         </div>
         <Select value={timeRange} onValueChange={(value: "7d" | "30d" | "90d" | "all") => setTimeRange(value)}>
           <SelectTrigger className="w-full sm:w-[180px]">
@@ -150,74 +153,74 @@ export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) =>
       {/* Stats Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Revenue</p>
-              <p className="text-2xl font-bold">${chartData.stats.totalRevenue.toFixed(2)}</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Revenue</p>
+              <p className="text-xl sm:text-2xl font-bold truncate">${chartData.stats.totalRevenue.toFixed(2)}</p>
               <p
-                className={`text-xs mt-1 flex items-center gap-1 ${
+                className={`text-xs mt-1 flex items-center gap-1 flex-wrap ${
                   chartData.stats.revenueChange >= 0 ? "text-success" : "text-destructive"
                 }`}
               >
-                <TrendingUp className="h-3 w-3" />
-                {chartData.stats.revenueChange >= 0 ? "+" : ""}
-                {chartData.stats.revenueChange.toFixed(1)}% vs previous period
+                <TrendingUp className="h-3 w-3 flex-shrink-0" />
+                <span>{chartData.stats.revenueChange >= 0 ? "+" : ""}{chartData.stats.revenueChange.toFixed(1)}%</span>
+                <span className="hidden sm:inline">vs previous period</span>
               </p>
             </div>
-            <div className="p-3 rounded-lg bg-primary/10">
-              <DollarSign className="h-6 w-6 text-primary" />
+            <div className="p-2 sm:p-3 rounded-lg bg-primary/10 flex-shrink-0">
+              <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
           </div>
         </Card>
 
         <Card className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Avg Transaction</p>
-              <p className="text-2xl font-bold">${chartData.stats.avgTransaction.toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground mt-1">Per completed transaction</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Avg Transaction</p>
+              <p className="text-xl sm:text-2xl font-bold">${chartData.stats.avgTransaction.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Per completed transaction</p>
             </div>
-            <div className="p-3 rounded-lg bg-success/10">
-              <TrendingUp className="h-6 w-6 text-success" />
+            <div className="p-2 sm:p-3 rounded-lg bg-success/10 flex-shrink-0">
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
             </div>
           </div>
         </Card>
 
         <Card className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Success Rate</p>
-              <p className="text-2xl font-bold">{chartData.stats.successRate.toFixed(1)}%</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Success Rate</p>
+              <p className="text-xl sm:text-2xl font-bold">{chartData.stats.successRate.toFixed(1)}%</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {chartData.stats.totalTransactions} total transactions
+                {chartData.stats.totalTransactions} <span className="hidden sm:inline">total transactions</span>
               </p>
             </div>
-            <div className="p-3 rounded-lg bg-warning/10">
-              <CreditCard className="h-6 w-6 text-warning" />
+            <div className="p-2 sm:p-3 rounded-lg bg-warning/10 flex-shrink-0">
+              <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-warning" />
             </div>
           </div>
         </Card>
 
         <Card className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Transactions</p>
-              <p className="text-2xl font-bold">{chartData.stats.totalTransactions}</p>
-              <p className="text-xs text-muted-foreground mt-1">In selected period</p>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-1">Total Transactions</p>
+              <p className="text-xl sm:text-2xl font-bold">{chartData.stats.totalTransactions}</p>
+              <p className="text-xs text-muted-foreground mt-1 hidden sm:block">In selected period</p>
             </div>
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Calendar className="h-6 w-6 text-primary" />
+            <div className="p-2 sm:p-3 rounded-lg bg-primary/10 flex-shrink-0">
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
           </div>
         </Card>
       </div>
 
       {/* Charts */}
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Revenue Trend */}
         <Card className="p-4 sm:p-6">
-          <h3 className="text-lg font-semibold mb-4">Revenue Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">Revenue Trend</h3>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <AreaChart data={chartData.monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -243,8 +246,8 @@ export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) =>
 
         {/* Payment Method Distribution */}
         <Card className="p-4 sm:p-6">
-          <h3 className="text-lg font-semibold mb-4">Payment Method Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">Payment Method Distribution</h3>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <PieChart>
               <Pie
                 data={chartData.paymentMethodData}
@@ -274,8 +277,8 @@ export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) =>
 
         {/* Transaction Status Breakdown */}
         <Card className="p-4 sm:p-6">
-          <h3 className="text-lg font-semibold mb-4">Transaction Status Breakdown</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">Transaction Status Breakdown</h3>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <BarChart data={chartData.statusData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
@@ -292,8 +295,8 @@ export const AnalyticsDashboard = ({ transactions }: AnalyticsDashboardProps) =>
 
         {/* Status Pie Chart */}
         <Card className="p-4 sm:p-6">
-          <h3 className="text-lg font-semibold mb-4">Status Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-semibold mb-4">Status Distribution</h3>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <PieChart>
               <Pie
                 data={chartData.statusData}

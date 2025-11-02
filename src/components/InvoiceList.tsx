@@ -316,7 +316,7 @@ export const InvoiceList = ({ invoices, onInvoiceCreated, onInvoiceUpdate }: Inv
       {/* Invoice Details Dialog */}
       {selectedInvoice && (
         <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-4 p-4 sm:p-6">
             <InvoiceDetails invoice={selectedInvoice} />
           </DialogContent>
         </Dialog>

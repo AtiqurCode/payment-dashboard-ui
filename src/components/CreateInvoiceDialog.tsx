@@ -182,7 +182,7 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Client Information */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Client Information</h3>
+              <h3 className="text-sm sm:text-base font-semibold">Client Information</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -230,7 +230,7 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
 
             {/* Invoice Details */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Invoice Details</h3>
+              <h3 className="text-sm sm:text-base font-semibold">Invoice Details</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
@@ -278,46 +278,46 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
 
             {/* Invoice Items */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Items</h3>
-                <Button type="button" variant="outline" size="sm" onClick={addItem}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <h3 className="text-sm sm:text-base font-semibold">Items</h3>
+                <Button type="button" variant="outline" size="sm" onClick={addItem} className="w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Item
                 </Button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-4 items-start">
+                  <div key={index} className="grid grid-cols-12 gap-2 sm:gap-4 items-start">
                     <div className="col-span-12 sm:col-span-5">
-                      <Label>Description</Label>
+                      <Label className="text-xs sm:text-sm">Description</Label>
                       <Input
                         placeholder="Item description"
                         value={item.description}
                         onChange={(e) => updateItem(index, "description", e.target.value)}
-                        className="mt-1"
+                        className="mt-1 text-sm"
                       />
                     </div>
                     <div className="col-span-6 sm:col-span-2">
-                      <Label>Quantity</Label>
+                      <Label className="text-xs sm:text-sm">Quantity</Label>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="1"
                         value={item.quantity}
                         onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value) || 0)}
-                        className="mt-1"
+                        className="mt-1 text-sm"
                       />
                     </div>
                     <div className="col-span-6 sm:col-span-3">
-                      <Label>Price</Label>
+                      <Label className="text-xs sm:text-sm">Price</Label>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="0.00"
                         value={item.price}
                         onChange={(e) => updateItem(index, "price", parseFloat(e.target.value) || 0)}
-                        className="mt-1"
+                        className="mt-1 text-sm"
                       />
                     </div>
                     <div className="col-span-12 sm:col-span-2 flex items-end">
@@ -327,7 +327,7 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
                         size="icon"
                         onClick={() => removeItem(index)}
                         disabled={items.length === 1}
-                        className="text-destructive"
+                        className="text-destructive w-full sm:w-auto"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -344,12 +344,13 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
                 name="taxRate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax Rate (%)</FormLabel>
+                    <FormLabel className="text-xs sm:text-sm">Tax Rate (%)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="0"
+                        className="text-sm"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -360,21 +361,21 @@ export const CreateInvoiceDialog = ({ onInvoiceCreated, trigger }: CreateInvoice
               />
 
               <div className="space-y-2">
-                <Label>Summary</Label>
-                <div className="p-4 border rounded-lg bg-muted/50 space-y-1">
-                  <div className="flex justify-between text-sm">
+                <Label className="text-xs sm:text-sm">Summary</Label>
+                <div className="p-3 sm:p-4 border rounded-lg bg-muted/50 space-y-1">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span>Subtotal:</span>
                     <span>${calculateSubtotal().toFixed(2)}</span>
                   </div>
                   {form.watch("taxRate") && form.watch("taxRate")! > 0 && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span>Tax ({form.watch("taxRate")}%):</span>
                       <span>
                         ${((calculateSubtotal() * form.watch("taxRate")!) / 100).toFixed(2)}
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between font-semibold pt-2 border-t">
+                  <div className="flex justify-between font-semibold pt-2 border-t text-sm sm:text-base">
                     <span>Total:</span>
                     <span>${calculateTotal(form.watch("taxRate") || 0).toFixed(2)}</span>
                   </div>
